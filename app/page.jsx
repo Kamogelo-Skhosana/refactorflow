@@ -14,7 +14,7 @@ export default function HomePage() {
         <div className="nav-links">
           <a href="#how-it-works">How it works</a>
           <a href="#principles">Principles</a>
-          <a href="#pricing">Pricing</a>
+          <Link href="/pricing">Pricing</Link>
           <Link className="text-link" href="/signin">Sign in</Link>
           <Link className="nav-cta" href="/signup">Get started <span>â†—</span></Link>
         </div>
