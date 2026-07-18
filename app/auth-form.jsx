@@ -16,7 +16,7 @@ export default function AuthForm({ mode }) {
     const response = await fetch(`/api/auth/${mode}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
     const data = await response.json();
     setLoading(false);
-    if (response.ok) { window.localStorage.setItem("refactorflow-email", email); if (mode === "signin") { router.push("/dashboard"); return; } }
+    if (response.ok) { window.localStorage.setItem("refactorflow-email", email); if (mode === "signin") { window.localStorage.setItem("refactorflow-show-name-prompt", "1"); router.push("/dashboard"); return; } }
     setMessage(response.ok ? "Account created. Check your email to confirm it." : data.error || "Something went wrong.");
   }
 
