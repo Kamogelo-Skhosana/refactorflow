@@ -1,0 +1,9 @@
+name: refactorflow
+
+services:
+  runner:
+    build:
+      context: ./runner
+      dockerfile: Dockerfile
+    image: refactorflow-python-runner:local
+
