@@ -2,7 +2,7 @@
   "name": "refactorflow",
   "version": "0.1.0",
   "private": true,
-  "scripts": {"dev": "next dev", "build": "next build", "start": "next start"},
+  "scripts": {"dev": "next dev", "build": "next build", "start": "next start", "runner:build": "docker compose build runner"},
   "dependencies": {"@monaco-editor/react": "4.7.0", "next": "16.1.6", "react": "19.2.4", "react-dom": "19.2.4", "zustand": "5.0.3"}
 }
 
