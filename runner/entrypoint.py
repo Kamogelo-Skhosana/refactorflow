@@ -32,8 +32,8 @@ def test_filename(index, name):
 def test_counts(output):
     passed = 0
     failed = 0
-    passed_match = re.search(r"(\\d+) passed", output)
-    failed_match = re.search(r"(\\d+) failed", output)
+    passed_match = re.search(r"(\d+) passed", output)
+    failed_match = re.search(r"(\d+) failed", output)
     if passed_match:
         passed = int(passed_match.group(1))
     if failed_match:
