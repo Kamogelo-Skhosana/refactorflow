@@ -1,0 +1,5 @@
+"use client";
+import { useEffect, useState } from "react";
+import ChallengeEditor from "./editor";
+export default function ChallengeWorkspace({ challenge }) { const [started, setStarted] = useState(false); const [seconds, setSeconds] = useState(0); useEffect(() => { if (!started) return undefined; const timer = window.setInterval(() => setSeconds((value) => value + 1), 1000); return () => window.clearInterval(timer); }, [started]); const time = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`; return <div className="challenge-split"><div className="problem-pane"><div className="problem-prose" dangerouslySetInnerHTML={{ __html: challenge.description }} /><button className="primary-button start-button" type="button" onClick={() => setStarted(true)} disabled={started}>{started ? "Challenge started" : "Start"}</button></div><div className="workspace-pane"><div className="workspace-editor"><ChallengeEditor starterCode={challenge.starter_code} started={started} time={time} /></div><div className="console-pane"><p>Console</p><pre>&gt; Ready. Run your code to see output here.</pre></div></div></div>; }
+
