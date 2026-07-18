@@ -54,7 +54,7 @@ function runInSandbox(payload) {
     const containerName = `refactorflow-run-${randomUUID()}`;
     const args = [
       "run", "--rm", "--name", containerName, "--network", "none", "--read-only", "--tmpfs", "/tmp:rw,nosuid,nodev,noexec,size=32m",
-      "--pids-limit", "64", "--memory", "128m", "--memory-swap", "128m", "--cpus", "0.5", "--cap-drop", "ALL",
+      "--pids-limit", "64", "--ulimit", "nproc=32:32", "--ulimit", "fsize=1048576:1048576", "--memory", "128m", "--memory-swap", "128m", "--cpus", "0.5", "--cap-drop", "ALL",
       "--security-opt", "no-new-privileges:true", "--user", "10001:10001", "--workdir", "/sandbox", "refactorflow-python-runner:local",
     ];
     const process = spawn("docker", args, { stdio: ["pipe", "pipe", "pipe"], windowsHide: true });
@@ -83,7 +83,10 @@ function runInSandbox(payload) {
 
 export async function POST(request, { params }) {
   const { slug } = await params;
-  const body = await request.json().catch(() => ({}));
+  const rawBody = await request.text();
+  if (rawBody.length > MAX_SOURCE_LENGTH + 1_000) return NextResponse.json({ error: "The submission is too large." }, { status: 413 });
+  let body;
+  try { body = JSON.parse(rawBody || "{}"); } catch { return NextResponse.json({ error: "Invalid submission payload." }, { status: 400 }); }
   if (typeof body.code !== "string" || body.code.length > MAX_SOURCE_LENGTH) return NextResponse.json({ error: "A valid Python submission is required." }, { status: 400 });
 
   const { url, secret, publishable } = getSupabaseConfig();
