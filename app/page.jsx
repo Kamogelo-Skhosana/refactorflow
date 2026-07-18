@@ -14,6 +14,7 @@ export default function HomePage() {
         <div className="nav-links">
           <a href="#how-it-works">How it works</a>
           <a href="#principles">Principles</a>
+          <a href="#pricing">Pricing</a>
           <Link className="text-link" href="/signin">Sign in</Link>
           <Link className="nav-cta" href="/signup">Get started <span>â†—</span></Link>
         </div>
@@ -43,8 +44,13 @@ export default function HomePage() {
         {features.map(([number, title, text]) => <article className="feature" key={number}><span className="feature-number">{number}</span><h2>{title}</h2><p>{text}</p></article>)}
       </section>
 
+      <section className="pricing shell" id="pricing">
+        <div><p className="kicker">Simple by design</p><h2>Start free.<br /><em>Grow when ready.</em></h2></div>
+        <div className="pricing-card"><span className="visual-label">FOUNDING PLAN</span><strong>Free to start</strong><p>Build your reflection habit with focused challenges and private progress signals.</p><Link className="primary-button" href="/signup">Get started <span>â†—</span></Link></div>
+      </section>
+
       <section className="closing shell"><p className="kicker">A better loop starts here</p><h2>Make your process<br /><em>visible.</em></h2><Link className="primary-button" href="/signup">Create your free workspace <span>â†—</span></Link></section>
-      <footer className="footer shell"><Link className="brand" href="/">Refactor<span>Flow</span></Link><p>Built for thoughtful builders.</p><p>Â© 2026 RefactorFlow</p></footer>
+      <footer className="footer shell"><Link className="brand" href="/">Refactor<span>Flow</span></Link><p>Built for thoughtful builders.</p><div className="footer-links"><Link href="/privacy">Privacy policy</Link><Link href="/terms">Terms &amp; conditions</Link></div><p>Â© 2026 RefactorFlow</p></footer>
     </main>
   );
 }
