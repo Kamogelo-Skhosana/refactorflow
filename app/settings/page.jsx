@@ -265,6 +265,7 @@ export default function SettingsPage() {
   function changeFontSize(size) {
     setFontSize(size);
     window.localStorage.setItem("refactorflow-editor-font-size", String(size));
+    window.dispatchEvent(new CustomEvent("refactorflow-font-size", { detail: size }));
     showToast("Editor font size saved");
   }
 
