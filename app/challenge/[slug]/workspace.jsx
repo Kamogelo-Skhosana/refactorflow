@@ -157,7 +157,9 @@ export default function ChallengeWorkspace({ challenge }) {
 
   useEffect(() => {
     const preferredDark = window.localStorage.getItem("refactorflow-theme") === "dark" || document.documentElement.classList.contains("dark");
+    const storedFontSize = Number(window.localStorage.getItem("refactorflow-editor-font-size"));
     setDark(preferredDark);
+    if ([12, 14, 16].includes(storedFontSize)) setFontSize(storedFontSize);
   }, []);
 
   useEffect(() => {
