@@ -235,6 +235,7 @@ export default function ChallengesClient({ challenges }) {
   }), [preparedChallenges, search, difficulty]);
 
   const completedIds = useMemo(() => new Set(progress.completedExerciseIds || []), [progress.completedExerciseIds]);
+  const completedCount = useMemo(() => preparedChallenges.filter((challenge) => completedIds.has(challenge.id)).length, [preparedChallenges, completedIds]);
 
   function toggleTheme() {
     const nextDark = !dark;
@@ -272,7 +273,7 @@ export default function ChallengesClient({ challenges }) {
           <ThemeButton dark={dark} onToggle={toggleTheme} />
         </header>
         <Filters value={searchInput} difficulty={difficulty} onValueChange={setSearchInput} onDifficultyChange={setDifficulty} />
-        <ProgressBar completed={completedIds.size} total={preparedChallenges.length} />
+        <ProgressBar completed={completedCount} total={preparedChallenges.length} />
         <ExerciseList challenges={filteredChallenges} completedIds={completedIds} bestScores={progress.bestThrashingByExercise || {}} onClear={clearFilters} />
       </div>
     </section>
