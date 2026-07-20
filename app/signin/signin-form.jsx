@@ -25,18 +25,18 @@ function ComparisonCard() {
     <div className={styles.codePanels}>
       <article className={styles.codePanel}>
         <div className={styles.panelHeader}><span className={styles.developerA}>Developer A</span><span className={styles.badge}>&#10003; 5/5</span></div>
-        <pre className={styles.codeBlock}>def is_palindrome(s):{"
-"}    clean = s.lower(){"
-"}    return clean == clean[::-1]</pre>
+        <pre className={styles.codeBlock}>{`def is_palindrome(s):
+    clean = s.lower()
+    return clean == clean[::-1]`}</pre>
         <p className={styles.codeMetric}>4 backspaces &middot; 28s</p>
       </article>
       <article className={styles.codePanel}>
         <div className={styles.panelHeader}><span className={styles.developerB}>Developer B</span><span className={styles.badge}>&#10003; 5/5</span></div>
-        <pre className={styles.codeBlock}>def is_palindrome(s):{"
-"}    <del>if s == s[::-1]:</del>{"
-"}    <del>return True</del>{"
-"}    clean = s.lower(){"
-"}    return clean == clean[::-1]</pre>
+        <pre className={styles.codeBlock}>{`def is_palindrome(s):
+    if s == s[::-1]:
+        return True
+    clean = s.lower()
+    return clean == clean[::-1]`}</pre>
         <p className={styles.codeMetric}>47 backspaces &middot; 4m 12s</p>
       </article>
     </div>
