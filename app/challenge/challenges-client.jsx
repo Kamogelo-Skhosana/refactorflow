@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import AppShell from "../components/app-shell";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./challenges.module.css";
 
@@ -259,9 +260,7 @@ export default function ChallengesClient({ challenges }) {
     setDifficulty("all");
   }
 
-  return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
-    <Sidebar profile={progress.profile} onSignOut={signOut} />
-    <MobileNav profile={progress.profile} dark={dark} onToggle={toggleTheme} />
+  return <AppShell className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")} profile={progress.profile} active="challenges" dark={dark} onToggle={toggleTheme} onSignOut={signOut}>
     <section className={styles.mainPanel}>
       <div className={styles.mainInner}>
         <header className={styles.pageHeader}>
@@ -277,5 +276,5 @@ export default function ChallengesClient({ challenges }) {
         <ExerciseList challenges={filteredChallenges} completedIds={completedIds} bestScores={progress.bestThrashingByExercise || {}} onClear={clearFilters} />
       </div>
     </section>
-  </main>;
+  </AppShell>;
 }
