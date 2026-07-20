@@ -5,11 +5,13 @@ import resource
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree as element_tree
 
 
 MAX_SOURCE_BYTES = 100_000
 MAX_TEST_BYTES = 250_000
 MAX_OUTPUT_BYTES = 12_000
+MAX_RESULTS = 100
 
 
 def respond(payload):
@@ -29,16 +31,27 @@ def test_filename(index, name):
     return f"test_{index}_{safe_name}.py"
 
 
-def test_counts(output):
-    passed = 0
-    failed = 0
-    passed_match = re.search(r"(\d+) passed", output)
-    failed_match = re.search(r"(\d+) failed", output)
-    if passed_match:
-        passed = int(passed_match.group(1))
-    if failed_match:
-        failed = int(failed_match.group(1))
-    return passed, failed
+def safe_result_details(xml_path):
+    try:
+        root = element_tree.parse(xml_path).getroot()
+    except (OSError, element_tree.ParseError):
+        return []
+
+    details = []
+    for index, test_case in enumerate(root.iter("testcase"), start=1):
+        if index > MAX_RESULTS:
+            break
+
+        if test_case.find("skipped") is not None:
+            details.append({"name": f"Test {index}", "status": "skipped", "error": "Skipped for this run."})
+        elif test_case.find("failure") is not None:
+            details.append({"name": f"Test {index}", "status": "failed", "error": "Assertion did not pass. Review the expected behavior and try again."})
+        elif test_case.find("error") is not None:
+            details.append({"name": f"Test {index}", "status": "error", "error": "The solution raised an error while this test ran."})
+        else:
+            details.append({"name": f"Test {index}", "status": "passed"})
+
+    return details
 
 
 def main():
@@ -84,9 +97,21 @@ def main():
             respond({"status": "error", "message": "No valid tests were supplied."})
             return
 
+        results_path = os.path.join(workdir, "results.xml")
         try:
             completed = subprocess.run(
-                [sys.executable, "-B", "-m", "pytest", "-q", "--disable-warnings", "--maxfail=1", "-p", "no:cacheprovider", workdir],
+                [
+                    sys.executable,
+                    "-B",
+                    "-m",
+                    "pytest",
+                    "-q",
+                    "--disable-warnings",
+                    "-p",
+                    "no:cacheprovider",
+                    f"--junitxml={results_path}",
+                    workdir,
+                ],
                 cwd=workdir,
                 capture_output=True,
                 text=True,
@@ -95,19 +120,25 @@ def main():
                 preexec_fn=limit_resources,
             )
         except subprocess.TimeoutExpired:
-            respond({"status": "timeout", "passed": 0, "failed": 0, "total": valid_tests})
+            respond({"status": "timeout", "passed": 0, "failed": 0, "total": valid_tests, "tests": []})
             return
 
         output = ((completed.stdout or "") + "\n" + (completed.stderr or ""))[:MAX_OUTPUT_BYTES]
-        passed, failed = test_counts(output)
-        total = max(valid_tests, passed + failed)
+        details = safe_result_details(results_path)
+        if not details:
+            details = [{"name": f"Test {index}", "status": "error", "error": "The test result could not be read."} for index in range(1, valid_tests + 1)]
+
+        passed = sum(1 for detail in details if detail["status"] == "passed")
+        failed = sum(1 for detail in details if detail["status"] in {"failed", "error"})
+        total = len(details)
+
         if completed.returncode == 0:
-            respond({"status": "passed", "passed": valid_tests, "failed": 0, "total": valid_tests})
+            respond({"status": "passed", "passed": passed, "failed": 0, "total": total, "tests": details})
             return
 
-        respond({"status": "failed", "passed": passed, "failed": max(1, failed), "total": total})
+        status = "failed" if failed else "error"
+        respond({"status": status, "passed": passed, "failed": max(1, failed), "total": total, "tests": details, "message": "Some checks did not pass."})
 
 
 if __name__ == "__main__":
     main()
-
