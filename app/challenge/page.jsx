@@ -8,7 +8,7 @@ async function getChallenges() {
   if (!url || !key) return [];
 
   const response = await fetch(
-    url + "/rest/v1/challenges?select=id,slug,title,language,difficulty,starter_code,created_at&order=created_at.asc",
+    url + "/rest/v1/challenges?select=id,slug,title,language,difficulty,starter_code,created_at&order=created_at.asc,id.asc",
     {
       headers: { apikey: key },
       next: { revalidate: 3600 },
