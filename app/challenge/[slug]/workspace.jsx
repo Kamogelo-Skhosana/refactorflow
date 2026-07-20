@@ -209,6 +209,12 @@ export default function ChallengeWorkspace({ challenge }) {
   }, [nudge]);
 
   useEffect(() => {
+    if (!successVisible) return undefined;
+    const timeout = window.setTimeout(() => setSuccessVisible(false), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [successVisible]);
+
+  useEffect(() => {
     const shortcuts = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
         event.preventDefault();
@@ -304,6 +310,7 @@ export default function ChallengeWorkspace({ challenge }) {
     if (checking) return;
     setChecking(true);
     setTimerRunning(false);
+    setSuccessVisible(false);
     setRunError("");
 
     const accessToken = window.localStorage.getItem("refactorflow-access-token");
