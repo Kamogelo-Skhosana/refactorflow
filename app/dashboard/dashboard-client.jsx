@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import AppShell from "../components/app-shell";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -314,9 +315,7 @@ export default function DashboardClient() {
 
   const profile = dashboard?.profile || { name: "there", email: "", tier: "free", avatarUrl: null };
 
-  return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
-    <Sidebar profile={profile} dark={dark} onToggle={toggleTheme} onSignOut={signOut} />
-    <MobileNav profile={profile} dark={dark} onToggle={toggleTheme} />
+  return <AppShell className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")} profile={profile} active="dashboard" dark={dark} onToggle={toggleTheme} onSignOut={signOut}>
     <section className={styles.mainPanel}>
       {loading ? <DashboardSkeleton /> : error ? <div className={styles.errorState}><Icon name="trend" size={32} /><h1>Dashboard unavailable.</h1><p>{error}</p><Link className={styles.startButton} href="/signin">Sign in</Link></div> : <div className={styles.mainInner}>
         <header className={styles.pageHeader}><div><h1>{greetingFor(profile.name)}</h1><p>Here&apos;s how your coding behavior is trending.</p></div><div><ThemeButton dark={dark} onToggle={toggleTheme} /><Link className={styles.startButton} href="/challenge">Start a challenge <Icon name="arrow" size={14} /></Link></div></header>
@@ -328,5 +327,5 @@ export default function DashboardClient() {
         <section className={styles.quickActions}><Link href="/challenge"><Icon name="code" size={14} />Browse all challenges</Link><Link href="/settings"><Icon name="settings" size={14} />Settings</Link></section>
       </div>}
     </section>
-  </main>;
+  </AppShell>;
 }
