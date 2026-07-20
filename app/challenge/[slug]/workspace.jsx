@@ -81,9 +81,9 @@ function ResultsTab({ result, sessionId, expandedErrors, onToggleError }) {
   </div>;
 }
 
-function HintCard({ level, seconds, content, onReveal, revealing }) {
+function HintCard({ level, seconds, content, onReveal, revealing, earlyLevelTwoUnlock }) {
   const unlockAt = level === 1 ? 0 : level === 2 ? 180 : 360;
-  const unlocked = seconds >= unlockAt;
+  const unlocked = seconds >= unlockAt || (level === 2 && earlyLevelTwoUnlock);
   const remaining = Math.max(0, unlockAt - seconds);
 
   if (content) {
@@ -106,11 +106,11 @@ function HintCard({ level, seconds, content, onReveal, revealing }) {
   </article>;
 }
 
-function HintsTab({ seconds, revealedHints, onReveal, revealing, hintError }) {
+function HintsTab({ seconds, revealedHints, onReveal, revealing, hintError, earlyLevelTwoUnlock }) {
   return <div className={styles.hintsContent}>
     <header><strong>Hints</strong><span>3 levels</span></header>
     <p className={styles.hintNote}>Hints unlock as your session progresses. Using hints does not affect your pass/fail result.</p>
-    <div className={styles.hintList}>{[1, 2, 3].map((level) => <HintCard key={level} level={level} seconds={seconds} content={revealedHints[level]} onReveal={onReveal} revealing={revealing === level} />)}</div>
+    <div className={styles.hintList}>{[1, 2, 3].map((level) => <HintCard key={level} level={level} seconds={seconds} content={revealedHints[level]} onReveal={onReveal} revealing={revealing === level} earlyLevelTwoUnlock={earlyLevelTwoUnlock} />)}</div>
     {hintError && <p className={styles.hintError}>{hintError}</p>}
   </div>;
 }
@@ -139,6 +139,7 @@ export default function ChallengeWorkspace({ challenge }) {
   const [revealedHints, setRevealedHints] = useState({});
   const [revealing, setRevealing] = useState(0);
   const [hintError, setHintError] = useState("");
+  const [panicHintUnlocked, setPanicHintUnlocked] = useState(false);
   const [nudgesEnabled, setNudgesEnabled] = useState(true);
   const [nudge, setNudge] = useState(null);
   const [successVisible, setSuccessVisible] = useState(false);
@@ -236,6 +237,7 @@ export default function ChallengeWorkspace({ challenge }) {
     const now = Date.now();
     if (now - (nudgeCooldowns.current[type] || 0) < 300000) return;
     nudgeCooldowns.current[type] = now;
+    if (type === "panicPause") setPanicHintUnlocked(true);
 
     const messages = {
       panicPause: { title: "Take a breath.", message: "Break the problem into smaller steps - what is the very first thing the function needs to do?" },
@@ -273,6 +275,7 @@ export default function ChallengeWorkspace({ challenge }) {
     setSessionId("");
     setRunError("");
     setExpandedErrors({});
+    setPanicHintUnlocked(false);
     setActiveTab("description");
   }
 
@@ -401,7 +404,7 @@ export default function ChallengeWorkspace({ challenge }) {
         <div className={styles.tabContent}>
           {activeTab === "description" && <div className={styles.description}><p>{challenge.description}</p><section><small>Function signature</small><pre><code>{signature}</code></pre></section></div>}
           {activeTab === "results" && <ResultsTab result={result} sessionId={sessionId} expandedErrors={expandedErrors} onToggleError={(index) => setExpandedErrors((current) => ({ ...current, [index]: !current[index] }))} />}
-          {activeTab === "hints" && <HintsTab seconds={seconds} revealedHints={revealedHints} onReveal={revealHint} revealing={revealing} hintError={hintError} />}
+          {activeTab === "hints" && <HintsTab seconds={seconds} revealedHints={revealedHints} onReveal={revealHint} revealing={revealing} hintError={hintError} earlyLevelTwoUnlock={panicHintUnlocked} />}
           {runError && activeTab === "results" && <p className={styles.runError}>{runError}</p>}
         </div>
       </aside>
