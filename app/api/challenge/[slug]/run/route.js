@@ -25,6 +25,24 @@ function safeRunnerMessage(status) {
   return "The isolated runner could not check this submission.";
 }
 
+
+function safeTestDetails(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 100).map((entry, index) => {
+    const status = entry?.status === "passed" || entry?.status === "failed" || entry?.status === "error" || entry?.status === "skipped"
+      ? entry.status
+      : "error";
+    const fallback = status === "failed"
+      ? "Assertion did not pass. Review the expected behavior and try again."
+      : status === "error"
+        ? "The solution raised an error while this test ran."
+        : status === "skipped"
+          ? "Skipped for this run."
+          : "";
+    return { name: "Test " + (index + 1), status, ...(status === "passed" ? {} : { error: fallback }) };
+  });
+}
+
 async function getAuthenticatedUser(request, url, publishable) {
   const authorization = request.headers.get("authorization") || "";
   if (!authorization.startsWith("Bearer ")) return null;
@@ -107,7 +125,13 @@ export async function POST(request, { params }) {
   if (!tests.length) return NextResponse.json({ error: "No tests are configured for this challenge." }, { status: 422 });
 
   const result = await runInSandbox({ code: body.code, tests: tests.map((test) => ({ name: test.test_name, code: test.test_code })) });
-  const response = { status: result.status, passed: Number.isInteger(result.passed) ? result.passed : 0, failed: Number.isInteger(result.failed) ? result.failed : 0, total: Number.isInteger(result.total) ? result.total : tests.length };
+  const response = {
+    status: result.status,
+    passed: Number.isInteger(result.passed) ? result.passed : 0,
+    failed: Number.isInteger(result.failed) ? result.failed : 0,
+    total: Number.isInteger(result.total) ? result.total : tests.length,
+    tests: safeTestDetails(result.tests),
+  };
   if (result.status === "passed" || result.status === "failed") return NextResponse.json(response);
   return NextResponse.json({ ...response, error: safeRunnerMessage(result.status) }, { status: result.status === "timeout" ? 408 : 503 });
 }
