@@ -220,7 +220,8 @@ function RecommendedChallenge({ challenge }) {
   }
 
   const difficulty = challenge.difficulty === "fundamentals" ? "beginner" : challenge.difficulty || "beginner";
-  const description = challenge.description.length > 120 ? challenge.description.slice(0, 120).trim() + "..." : challenge.description;
+  const descriptionText = String(challenge.description || "");
+  const description = descriptionText.length > 120 ? descriptionText.slice(0, 120).trim() + "..." : descriptionText;
   return <section className={styles.card + " " + styles.recommendedCard}>
     <p className={styles.upNext}>Up next</p>
     <span className={styles.topicBadge}>{challenge.language === "python" ? "Python Fundamentals" : challenge.language}</span>
