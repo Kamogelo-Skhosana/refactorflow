@@ -311,7 +311,7 @@ export default function DashboardClient() {
     router.replace("/signin");
   }
 
-  const profile = dashboard?.profile || { name: window.localStorage.getItem("refactorflow-display-name") || "there", email: "", tier: "free", avatarUrl: null };
+  const profile = dashboard?.profile || { name: "there", email: "", tier: "free", avatarUrl: null };
 
   return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
     <Sidebar profile={profile} dark={dark} onToggle={toggleTheme} onSignOut={signOut} />
