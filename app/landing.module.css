@@ -725,6 +725,7 @@
 .howSection,
 .pricingSection,
 .faqSection {
+  scroll-margin-top: 80px;
   background: var(--soft);
   text-align: center;
 }
