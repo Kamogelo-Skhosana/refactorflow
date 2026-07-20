@@ -64,7 +64,7 @@ export default function ChallengeWorkspace({ challenge }) {
     window.localStorage.setItem(`refactorflow-session-${challenge.slug}`, JSON.stringify(record));
     fetch("/api/sessions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
       body: JSON.stringify({
         exerciseId: challenge.id,
         submittedCode: data.submittedCode,
