@@ -763,6 +763,10 @@
     font-size: 24px;
   }
 
+  .pageHeader > .themeButton {
+    display: none;
+  }
+
   .filters {
     display: block;
   }
