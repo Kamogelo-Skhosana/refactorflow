@@ -400,6 +400,10 @@
   font-weight: 700;
 }
 
+.topicList {
+  display: block;
+}
+
 .topicSection {
   margin-bottom: 32px;
 }
