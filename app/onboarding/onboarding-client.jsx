@@ -112,7 +112,7 @@ export default function OnboardingClient() {
           <h2>What brings you here?</h2>
           <p>Choose a starting point. You can change your focus anytime.</p>
           <div className={styles.goals}>
-            {goals.map((item) => <button type="button" onClick={() => setGoal(item.id)} className={goal === item.id ? styles.goalSelected : ""} key={item.id}><strong>{item.label}</strong><span>{item.note}</span><i>{goal === item.id ? "&#10003;" : ""}</i></button>)}
+            {goals.map((item) => <button type="button" onClick={() => setGoal(item.id)} className={goal === item.id ? styles.goalSelected : ""} key={item.id}><strong>{item.label}</strong><span>{item.note}</span><i>{goal === item.id ? <>&#10003;</> : ""}</i></button>)}
           </div>
           <div className={styles.actions}><button className={styles.back} type="button" onClick={() => setStep(1)}>Back</button><button className={styles.primary} type="button" onClick={() => setStep(3)}>Continue <span>&rarr;</span></button></div>
         </>}
