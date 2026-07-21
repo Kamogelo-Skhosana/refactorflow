@@ -44,6 +44,22 @@ function ComparisonCard() {
   </section>;
 }
 
+async function routeAfterAuthentication(accessToken) {
+  const fallback = window.localStorage.getItem("refactorflow-onboarding-pending") === "1" ? "/onboarding" : "/dashboard";
+  if (!accessToken) return fallback;
+  try {
+    const response = await fetch("/api/profile", {
+      headers: { Authorization: "Bearer " + accessToken },
+      cache: "no-store",
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok && data.profile?.onboarded === false) return "/onboarding";
+  } catch {
+    // Preserve the local fallback if the profile is temporarily unavailable.
+  }
+  return fallback;
+}
+
 export default function SigninForm() {
   const router = useRouter();
   const passwordRef = useRef(null);
@@ -66,10 +82,11 @@ export default function SigninForm() {
     const accessToken = fragment.get("access_token");
     if (!accessToken) return;
     window.localStorage.setItem("refactorflow-access-token", accessToken);
-    const nextRoute = window.localStorage.getItem("refactorflow-onboarding-pending") === "1" ? "/onboarding" : "/dashboard";
-    if (nextRoute === "/dashboard") window.localStorage.setItem("refactorflow-show-name-prompt", "1");
     window.history.replaceState({}, document.title, window.location.pathname);
-    router.replace(nextRoute);
+    void routeAfterAuthentication(accessToken).then((nextRoute) => {
+      if (nextRoute === "/dashboard") window.localStorage.setItem("refactorflow-show-name-prompt", "1");
+      router.replace(nextRoute);
+    });
   }, [router]);
 
   function toggleTheme() {
@@ -102,8 +119,9 @@ export default function SigninForm() {
         return;
       }
       window.localStorage.setItem("refactorflow-email", email.trim());
-      if (data.session?.access_token) window.localStorage.setItem("refactorflow-access-token", data.session.access_token);
-      const nextRoute = window.localStorage.getItem("refactorflow-onboarding-pending") === "1" ? "/onboarding" : "/dashboard";
+      const accessToken = data.session?.access_token || "";
+      if (accessToken) window.localStorage.setItem("refactorflow-access-token", accessToken);
+      const nextRoute = await routeAfterAuthentication(accessToken);
       if (nextRoute === "/dashboard") window.localStorage.setItem("refactorflow-show-name-prompt", "1");
       router.push(nextRoute);
     } catch {
