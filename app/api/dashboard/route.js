@@ -6,7 +6,6 @@ export const runtime = "nodejs";
 function getSupabaseConfig() {
   return {
     url: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
-    secret: process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY,
     publishable: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   };
 }
@@ -66,8 +65,8 @@ function asNumber(value) {
 }
 
 export async function GET(request) {
-  const { url, secret, publishable } = getSupabaseConfig();
-  if (!url || !secret || !publishable) {
+  const { url, publishable } = getSupabaseConfig();
+  if (!url || !publishable) {
     return NextResponse.json({ error: "Dashboard data is not configured yet." }, { status: 503 });
   }
 
@@ -76,7 +75,8 @@ export async function GET(request) {
     return NextResponse.json({ error: "Please sign in again to view your dashboard." }, { status: 401 });
   }
 
-  const headers = { apikey: secret, Authorization: "Bearer " + secret };
+  const authorization = request.headers.get("authorization") || "";
+  const headers = { apikey: publishable, Authorization: authorization };
   const userId = encodeURIComponent(user.id);
   const [profileResponse, sessionsResponse, challengesResponse] = await Promise.all([
     fetch(url + "/rest/v1/profiles?id=eq." + userId + "&select=id,email,display_name,tier,avatar_url&limit=1", { headers, cache: "no-store" }),
