@@ -409,7 +409,7 @@ export default function ChallengeWorkspace({ challenge }) {
           {activeTab === "description" && <div className={styles.description}><p>{challenge.description}</p><section><small>Function signature</small><pre><code>{signature}</code></pre></section></div>}
           {activeTab === "results" && <ResultsTab result={result} sessionId={sessionId} expandedErrors={expandedErrors} onToggleError={(index) => setExpandedErrors((current) => ({ ...current, [index]: !current[index] }))} />}
           {activeTab === "hints" && <HintsTab seconds={seconds} revealedHints={revealedHints} onReveal={revealHint} revealing={revealing} hintError={hintError} earlyLevelTwoUnlock={panicHintUnlocked} />}
-          {runError && activeTab === "results" && <p className={styles.runError}>{runError}</p>}
+          {runError && activeTab === "results" && <p className={styles.runError} role="alert">{runError}</p>}
         </div>
       </aside>
       <div className={styles.resizeHandle} role="separator" aria-label="Resize challenge panel" aria-orientation="vertical" onPointerDown={beginResize} onPointerMove={resize} />
