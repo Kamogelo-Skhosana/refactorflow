@@ -10,7 +10,7 @@ Group=refactorflow-runner
 SupplementaryGroups=docker
 WorkingDirectory=/opt/refactorflow/runner
 EnvironmentFile=/etc/refactorflow/runner.env
-ExecStart=/opt/refactorflow/runner/.venv/bin/uvicorn service:app --host 127.0.0.1 --port 8081 --workers 1 --no-access-log
+ExecStart=/opt/refactorflow/.venv/bin/uvicorn service:app --host 127.0.0.1 --port 8081 --workers 1 --no-access-log
 Restart=always
 RestartSec=3
 NoNewPrivileges=true
@@ -26,4 +26,3 @@ MemoryDenyWriteExecute=true
 
 [Install]
 WantedBy=multi-user.target
-
