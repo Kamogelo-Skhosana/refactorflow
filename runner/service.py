@@ -135,6 +135,7 @@ def run_job(payload: ExecutionRequest) -> dict[str, Any]:
     command = [
         DOCKER_BIN,
         "run",
+        "-i",
         "--rm",
         "--name",
         container_name,
