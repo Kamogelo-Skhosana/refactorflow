@@ -203,7 +203,7 @@ export default function OnboardingClient() {
 
   return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
     <header className={styles.topbar}>
-      <Link className={styles.wordmark} href="/">Refactor<span>Flow</span></Link>
+      <Link className={styles.wordmark} href="/dashboard">Refactor<span>Flow</span></Link>
       <div>{canSkip && <button className={styles.skip} type="button" onClick={finish}>Skip for now &rarr;</button>}<button className={styles.theme} type="button" onClick={toggleTheme} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}><ThemeIcon dark={dark} /></button></div>
     </header>
 
