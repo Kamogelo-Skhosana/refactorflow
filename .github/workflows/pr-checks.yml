@@ -49,6 +49,9 @@ jobs:
       - name: Build Next.js application
         run: npm run build
 
+      - name: Verify production dependency audit
+        run: npm audit --audit-level=high
+
       # TODO(Stage 3): Uncomment after the Docker Python execution server has tests.
       # - name: Build and test Python execution server
       #   run: |
