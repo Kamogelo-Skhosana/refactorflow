@@ -342,6 +342,39 @@
 .exerciseStage h1 { font-size: clamp(32px, 4vw, 44px); }
 .exerciseStage > p { margin-bottom: 25px; }
 
+.exerciseDescription {
+  box-sizing: border-box;
+  margin: 0 0 12px;
+  padding: 15px 17px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  text-align: left;
+}
+
+.exerciseDescription > span {
+  display: block;
+  color: #10b981;
+  font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.exerciseDescription h2 {
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 16px;
+  letter-spacing: -0.03em;
+}
+
+.exerciseDescription p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 .miniEditor {
   overflow: hidden;
   border: 1px solid var(--border);
