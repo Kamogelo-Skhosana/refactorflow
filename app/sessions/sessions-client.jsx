@@ -130,7 +130,7 @@ export default function SessionsClient() {
         <div className={styles.listHeader}><span>Challenge</span><span>Outcome</span><span>Process</span><span /></div>
         {filtered.map((session) => <Link className={styles.row} href={"/report/" + session.id} key={session.id}>
           <div className={styles.challenge}>
-            <span className={session.result.status === "passed" ? styles.check : styles.dot}>{session.result.status === "passed" ? "&#10003;" : String(session.result.passed).padStart(2, "0")}</span>
+            <span className={session.result.status === "passed" ? styles.check : styles.dot}>{session.result.status === "passed" ? <>&#10003;</> : String(session.result.passed).padStart(2, "0")}</span>
             <span><strong>{session.challenge.title}</strong><small>{formatDate(session.createdAt)} &middot; {formatDuration(session.durationMs)}</small></span>
           </div>
           <span className={session.result.status === "passed" ? styles.passed : styles.failed}>{session.result.passed}/{session.result.total} passed</span>
