@@ -10,7 +10,7 @@ import xml.etree.ElementTree as element_tree
 
 MAX_SOURCE_BYTES = 100_000
 MAX_TEST_BYTES = 250_000
-MAX_OUTPUT_BYTES = 12_000
+MAX_TEST_FILES = 64
 MAX_RESULTS = 100
 
 
@@ -31,9 +31,23 @@ def test_filename(index, name):
     return f"test_{index}_{safe_name}.py"
 
 
-def safe_result_details(xml_path):
+def test_counts(report_path):
     try:
-        root = element_tree.parse(xml_path).getroot()
+        root = element_tree.parse(report_path).getroot()
+    except (OSError, element_tree.ParseError):
+        return 0, 0, 0, 0
+
+    cases = list(root.iter("testcase"))
+    failed = sum(1 for case in cases if case.find("failure") is not None)
+    errored = sum(1 for case in cases if case.find("error") is not None)
+    skipped = sum(1 for case in cases if case.find("skipped") is not None)
+    total = len(cases)
+    return max(total - failed - errored - skipped, 0), failed, errored, skipped
+
+
+def safe_result_details(report_path):
+    try:
+        root = element_tree.parse(report_path).getroot()
     except (OSError, element_tree.ParseError):
         return []
 
@@ -41,7 +55,6 @@ def safe_result_details(xml_path):
     for index, test_case in enumerate(root.iter("testcase"), start=1):
         if index > MAX_RESULTS:
             break
-
         if test_case.find("skipped") is not None:
             details.append({"name": f"Test {index}", "status": "skipped", "error": "Skipped for this run."})
         elif test_case.find("failure") is not None:
@@ -50,7 +63,6 @@ def safe_result_details(xml_path):
             details.append({"name": f"Test {index}", "status": "error", "error": "The solution raised an error while this test ran."})
         else:
             details.append({"name": f"Test {index}", "status": "passed"})
-
     return details
 
 
@@ -76,7 +88,7 @@ def main():
         for test in tests
         if isinstance(test, dict) and isinstance(test.get("code"), str)
     )
-    if not tests or combined_test_size > MAX_TEST_BYTES:
+    if not tests or len(tests) > MAX_TEST_FILES or combined_test_size > MAX_TEST_BYTES:
         respond({"status": "error", "message": "The test bundle is invalid."})
         return
 
@@ -97,7 +109,7 @@ def main():
             respond({"status": "error", "message": "No valid tests were supplied."})
             return
 
-        results_path = os.path.join(workdir, "results.xml")
+        report_path = os.path.join(workdir, "results.xml")
         try:
             completed = subprocess.run(
                 [
@@ -109,36 +121,49 @@ def main():
                     "--disable-warnings",
                     "-p",
                     "no:cacheprovider",
-                    f"--junitxml={results_path}",
+                    f"--junitxml={report_path}",
                     workdir,
                 ],
                 cwd=workdir,
                 capture_output=True,
                 text=True,
                 timeout=3,
-                env={"PATH": os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1", "PYTHONUNBUFFERED": "1"},
+                env={
+                    "PATH": os.environ.get("PATH", ""),
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                    "PYTHONUNBUFFERED": "1",
+                    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+                },
                 preexec_fn=limit_resources,
             )
         except subprocess.TimeoutExpired:
-            respond({"status": "timeout", "passed": 0, "failed": 0, "total": valid_tests, "tests": []})
+            respond({"status": "timeout", "passed": 0, "failed": 0, "total": 0, "tests": []})
             return
 
-        output = ((completed.stdout or "") + "\n" + (completed.stderr or ""))[:MAX_OUTPUT_BYTES]
-        details = safe_result_details(results_path)
+        passed, failed, errored, skipped = test_counts(report_path)
+        details = safe_result_details(report_path)
         if not details:
-            details = [{"name": f"Test {index}", "status": "error", "error": "The test result could not be read."} for index in range(1, valid_tests + 1)]
-
-        passed = sum(1 for detail in details if detail["status"] == "passed")
-        failed = sum(1 for detail in details if detail["status"] in {"failed", "error"})
-        total = len(details)
-
+            details = [
+                {"name": f"Test {index}", "status": "error", "error": "The test result could not be read."}
+                for index in range(1, min(valid_tests, MAX_RESULTS) + 1)
+            ]
+        total = passed + failed + errored + skipped
         if completed.returncode == 0:
             respond({"status": "passed", "passed": passed, "failed": 0, "total": total, "tests": details})
             return
 
-        status = "failed" if failed else "error"
-        respond({"status": status, "passed": passed, "failed": max(1, failed), "total": total, "tests": details, "message": "Some checks did not pass."})
+        failures = failed + errored
+        respond(
+            {
+                "status": "failed",
+                "passed": passed,
+                "failed": max(1, failures),
+                "total": max(total, max(1, failures)),
+                "tests": details,
+            }
+        )
 
 
 if __name__ == "__main__":
     main()
+
