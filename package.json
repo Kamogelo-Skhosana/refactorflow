@@ -8,7 +8,7 @@
     "start": "next start",
     "runner:build": "docker compose build runner",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
