@@ -1,0 +1,88 @@
+.page {
+  min-height: calc(100svh - 76px);
+  display: grid;
+  place-items: center;
+  padding: 50px 24px 90px;
+}
+
+.card {
+  width: min(570px, 100%);
+  padding: 48px;
+  border: 1px solid var(--marketing-border);
+  border-radius: 16px;
+  background: var(--marketing-card);
+  text-align: center;
+  box-shadow: 0 20px 55px rgba(10, 10, 10, 0.06);
+}
+
+.code {
+  margin: 0;
+  color: #10b981;
+  font: 800 13px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.12em;
+}
+
+.card h1 {
+  margin: 16px 0 0;
+  color: var(--marketing-text);
+  font-size: clamp(32px, 5vw, 50px);
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+
+.card > p:not(.code) {
+  max-width: 400px;
+  margin: 18px auto 0;
+  color: var(--marketing-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.primary,
+.secondary {
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: 1px solid var(--marketing-border);
+  border-radius: 8px;
+  color: var(--marketing-text);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary {
+  border-color: #10b981;
+  background: #10b981;
+  color: #0a0a0a;
+}
+
+.primary:hover {
+  background: #059669;
+}
+
+.secondary:hover {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+@media (max-width: 560px) {
+  .card {
+    padding: 36px 23px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}
