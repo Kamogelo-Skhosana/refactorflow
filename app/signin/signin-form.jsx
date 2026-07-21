@@ -44,6 +44,13 @@ function ComparisonCard() {
   </section>;
 }
 
+function handleWordmarkClick(event) {
+  if (window.localStorage.getItem("refactorflow-access-token")) {
+    event.preventDefault();
+    window.location.assign("/dashboard");
+  }
+}
+
 async function routeAfterAuthentication(accessToken) {
   const fallback = window.localStorage.getItem("refactorflow-onboarding-pending") === "1" ? "/onboarding" : "/dashboard";
   if (!accessToken) return fallback;
@@ -158,7 +165,7 @@ export default function SigninForm() {
 
   return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
     <aside className={styles.brandPanel}>
-      <Link className={styles.wordmark} href="/">RefactorFlow</Link>
+      <Link className={styles.wordmark} href="/" onClick={handleWordmarkClick}>RefactorFlow</Link>
       <div className={styles.comparisonWrap}><ComparisonCard /></div>
       <p className={styles.concepts}><span>Thrashing Index</span><span>Pause Detection</span><span>Keystroke Tape</span></p>
     </aside>
