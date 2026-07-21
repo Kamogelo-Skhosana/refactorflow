@@ -56,7 +56,7 @@ export async function GET(request, { params }) {
   const [session] = await sessionResponse.json();
   if (!session) return NextResponse.json({ error: "Report not found." }, { status: 404 });
 
-  const [challengeResponse, metricResponse] = await Promise.all([
+  const [challengeResponse, metricResponse, hintResponse] = await Promise.all([
     fetch(url + "/rest/v1/challenges?id=eq." + encodeURIComponent(session.exercise_id) + "&select=slug,title,language,difficulty,starter_code&limit=1", { headers, cache: "no-store" }),
     fetch(url + "/rest/v1/metrics?session_id=eq." + encodeURIComponent(id) + "&select=keystroke_count,backspace_count,pause_count,longest_pause_ms,thrashing_index,analysis&limit=1", { headers, cache: "no-store" }),
     fetch(url + "/rest/v1/hints_used?user_id=eq." + encodeURIComponent(user.id) + "&challenge_id=eq." + encodeURIComponent(session.exercise_id) + "&select=hint_level,created_at&order=created_at.asc&limit=10", { headers, cache: "no-store" }),
