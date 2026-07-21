@@ -236,6 +236,11 @@ export default function OnboardingClient() {
       {step === 3 && <div className={styles.exerciseStage}>
         <h1>Try a quick one.</h1>
         <p>This first exercise is short on purpose - we just want you to experience the editor and the report.</p>
+        <section className={styles.exerciseDescription} aria-labelledby="onboarding-exercise-title">
+          <span>About this exercise</span>
+          <h2 id="onboarding-exercise-title">{challenge?.title || "Pseudo range"}</h2>
+          <p>{challenge?.description || "Print every integer from 1 through n, one number per line."}</p>
+        </section>
         <section className={styles.miniEditor}>
           <header><code>{challenge?.slug?.replace(/-/g, "_")}()</code><strong>{formatTime(seconds)}</strong></header>
           <div className={styles.editorArea}><MonacoEditor height="240px" language={challenge?.language || "python"} theme={dark ? "vs-dark" : "vs"} value={code} onChange={changeCode} options={{ fontSize: 14, minimap: { enabled: false }, scrollBeyondLastLine: false, automaticLayout: true, padding: { top: 16, bottom: 16 }, ariaLabel: "Onboarding code editor" }} /></div>
