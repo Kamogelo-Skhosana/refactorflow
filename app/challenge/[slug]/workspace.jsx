@@ -317,6 +317,8 @@ export default function ChallengeWorkspace({ challenge }) {
     setTimerRunning(false);
     setSuccessVisible(false);
     setRunError("");
+    // Switch immediately so checking and any server-side error are always visible.
+    setActiveTab("results");
 
     const accessToken = window.localStorage.getItem("refactorflow-access-token");
     try {
