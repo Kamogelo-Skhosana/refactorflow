@@ -30,9 +30,17 @@ export default function MarketingLayout({ children, active = "" }) {
     setMenuOpen(false);
   }
 
+  function handleWordmarkClick(event) {
+    closeMenu();
+    if (window.localStorage.getItem("refactorflow-access-token")) {
+      event.preventDefault();
+      window.location.assign("/dashboard");
+    }
+  }
+
   return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
     <header className={styles.header}>
-      <Link className={styles.wordmark} href="/" onClick={closeMenu} aria-label="RefactorFlow home">Refactor<span>Flow</span></Link>
+      <Link className={styles.wordmark} href="/" onClick={handleWordmarkClick} aria-label="RefactorFlow home">Refactor<span>Flow</span></Link>
       <button className={styles.menuButton} type="button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
         <i /><i />
       </button>
@@ -52,7 +60,7 @@ export default function MarketingLayout({ children, active = "" }) {
 
     <footer className={styles.footer}>
       <div className={styles.footerTop}>
-        <Link className={styles.wordmark} href="/">Refactor<span>Flow</span></Link>
+        <Link className={styles.wordmark} href="/" onClick={handleWordmarkClick}>Refactor<span>Flow</span></Link>
         <p>Developer behavior intelligence for better practice.</p>
       </div>
       <div className={styles.footerBottom}>
