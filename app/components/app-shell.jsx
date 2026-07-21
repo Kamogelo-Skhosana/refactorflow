@@ -9,6 +9,7 @@ function Icon({ name, size = 16 }) {
     dashboard: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
     code: <><path d="m8 9-3 3 3 3M16 9l3 3-3 3M14 5l-4 14" /></>,
     settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2 2-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2.86v-.09A1.7 1.7 0 0 0 10.94 18.35a1.7 1.7 0 0 0-1.88.34L9 18.75l-2-2 .06-.06A1.7 1.7 0 0 0 7.4 14.8 1.7 1.7 0 0 0 5.84 13.77h-.09v-2.86h.09A1.7 1.7 0 0 0 7.4 9.88 1.7 1.7 0 0 0 7.06 8L7 7.94l2-2 .06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 11.97 4.8v-.09h2.86v.09a1.7 1.7 0 0 0 1.03 1.54A1.7 1.7 0 0 0 17.74 6l.06-.06 2 2-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.09v2.86h-.09A1.7 1.7 0 0 0 19.4 15Z" /></>,
+    history: <><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /><path d="M12 7v5l3.5 2" /></>,
     chevron: <path d="m9 18 6-6-6-6" />,
     moon: <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" />,
     sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></>,
@@ -61,6 +62,7 @@ function Navigation({ active, compact = false }) {
   const links = [
     { key: "dashboard", href: "/dashboard", label: "Dashboard", icon: "dashboard" },
     { key: "challenges", href: "/challenge", label: "Challenges", icon: "code" },
+    { key: "sessions", href: "/sessions", label: "Sessions", icon: "history" },
     { key: "settings", href: "/settings", label: "Settings", icon: "settings" },
   ];
 
