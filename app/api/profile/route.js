@@ -31,13 +31,14 @@ function profilePayload(profile, user) {
     avatarUrl: profile?.avatar_url || null,
     emailNotifications: profile?.email_notifications !== false,
     nudgesEnabled: profile?.nudges_enabled !== false,
+    onboarded: profile?.onboarded === true,
   };
 }
 
 async function findOrCreateProfile(url, headers, user) {
   const id = encodeURIComponent(user.id);
   const currentResponse = await fetch(
-    url + "/rest/v1/profiles?id=eq." + id + "&select=id,email,display_name,tier,avatar_url,email_notifications,nudges_enabled&limit=1",
+    url + "/rest/v1/profiles?id=eq." + id + "&select=id,email,display_name,tier,avatar_url,email_notifications,nudges_enabled,onboarded&limit=1",
     { headers, cache: "no-store" },
   );
   if (currentResponse.ok) {
@@ -50,6 +51,7 @@ async function findOrCreateProfile(url, headers, user) {
     email: user.email || "",
     display_name: typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name.trim().slice(0, 100) || null : null,
     tier: "free",
+    onboarded: false,
   };
   const createResponse = await fetch(url + "/rest/v1/profiles", {
     method: "POST",
@@ -113,6 +115,12 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "Invalid notification preference." }, { status: 400 });
     }
     update.email_notifications = body.emailNotifications;
+  }
+  if (Object.hasOwn(body || {}, "onboarded")) {
+    if (typeof body.onboarded !== "boolean") {
+      return NextResponse.json({ error: "Invalid onboarding state." }, { status: 400 });
+    }
+    update.onboarded = body.onboarded;
   }
   if (Object.hasOwn(body || {}, "nudgesEnabled")) {
     if (typeof body.nudgesEnabled !== "boolean") {
