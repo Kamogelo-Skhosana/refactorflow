@@ -1,0 +1,29 @@
+[Unit]
+Description=RefactorFlow private code runner
+After=docker.service network-online.target
+Wants=docker.service network-online.target
+
+[Service]
+Type=simple
+User=refactorflow-runner
+Group=refactorflow-runner
+SupplementaryGroups=docker
+WorkingDirectory=/opt/refactorflow/runner
+EnvironmentFile=/etc/refactorflow/runner.env
+ExecStart=/opt/refactorflow/runner/.venv/bin/uvicorn service:app --host 127.0.0.1 --port 8081 --workers 1 --no-access-log
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/run/docker.sock
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target
+
