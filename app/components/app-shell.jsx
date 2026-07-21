@@ -62,7 +62,6 @@ function Navigation({ active, compact = false }) {
   const links = [
     { key: "dashboard", href: "/dashboard", label: "Dashboard", icon: "dashboard" },
     { key: "challenges", href: "/challenge", label: "Challenges", icon: "code" },
-    { key: "sessions", href: "/sessions", label: "Sessions", icon: "history" },
     { key: "settings", href: "/settings", label: "Settings", icon: "settings" },
   ];
 
