@@ -46,7 +46,7 @@ export async function GET(request, { params }) {
 
   const headers = { apikey: secret, Authorization: "Bearer " + secret };
   const sessionResponse = await fetch(
-    url + "/rest/v1/sessions?id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(user.id) + "&select=id,exercise_id,duration_ms,run_result,created_at&limit=1",
+    url + "/rest/v1/sessions?id=eq." + encodeURIComponent(id) + "&user_id=eq." + encodeURIComponent(user.id) + "&select=id,exercise_id,duration_ms,run_result,created_at,keystroke_tape,pause_events&limit=1",
     { headers, cache: "no-store" },
   );
   if (!sessionResponse.ok) {
@@ -57,24 +57,35 @@ export async function GET(request, { params }) {
   if (!session) return NextResponse.json({ error: "Report not found." }, { status: 404 });
 
   const [challengeResponse, metricResponse] = await Promise.all([
-    fetch(url + "/rest/v1/challenges?id=eq." + encodeURIComponent(session.exercise_id) + "&select=slug,title&limit=1", { headers, cache: "no-store" }),
+    fetch(url + "/rest/v1/challenges?id=eq." + encodeURIComponent(session.exercise_id) + "&select=slug,title,language,difficulty,starter_code&limit=1", { headers, cache: "no-store" }),
     fetch(url + "/rest/v1/metrics?session_id=eq." + encodeURIComponent(id) + "&select=keystroke_count,backspace_count,pause_count,longest_pause_ms,thrashing_index,analysis&limit=1", { headers, cache: "no-store" }),
+    fetch(url + "/rest/v1/hints_used?user_id=eq." + encodeURIComponent(user.id) + "&challenge_id=eq." + encodeURIComponent(session.exercise_id) + "&select=hint_level,created_at&order=created_at.asc&limit=10", { headers, cache: "no-store" }),
   ]);
   const [challenge] = challengeResponse.ok ? await challengeResponse.json() : [];
   const [metrics] = metricResponse.ok ? await metricResponse.json() : [];
+  const hints = hintResponse.ok ? await hintResponse.json() : [];
   const run = session.run_result && typeof session.run_result === "object" ? session.run_result : {};
   const analysis = metrics?.analysis && typeof metrics.analysis === "object" ? metrics.analysis : {};
   const status = run.status === "passed" ? "passed" : "failed";
+  const tests = Array.isArray(run.tests) ? run.tests.slice(0, 100).map((test, index) => ({
+    name: typeof test?.name === "string" ? test.name.slice(0, 160) : "Test " + (index + 1),
+    status: test?.status === "passed" || test?.status === "skipped" || test?.status === "error" ? test.status : "failed",
+    error: typeof test?.error === "string" ? test.error.slice(0, 1000) : "",
+  })) : [];
 
   return NextResponse.json({
     id: session.id,
     createdAt: session.created_at,
-    challenge: challenge ? { slug: challenge.slug, title: challenge.title } : null,
+    challenge: challenge ? { slug: challenge.slug, title: challenge.title, language: challenge.language, difficulty: challenge.difficulty, starterCode: challenge.starter_code || "" } : null,
     result: {
       status,
       passed: safeInteger(run.passed),
       total: Math.max(safeInteger(run.total), 1),
+      tests,
     },
+    tape: typeof session.keystroke_tape === "string" ? session.keystroke_tape.slice(0, 250000) : "",
+    pauses: Array.isArray(session.pause_events) ? session.pause_events.slice(0, 500) : [],
+    hints: Array.isArray(hints) ? hints.map((hint) => ({ level: safeInteger(hint?.hint_level), createdAt: hint?.created_at || null })).filter((hint) => hint.level >= 1 && hint.level <= 3) : [],
     durationMs: safeInteger(session.duration_ms),
     metrics: {
       keystrokeCount: safeInteger(metrics?.keystroke_count),
