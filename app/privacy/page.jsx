@@ -1,8 +1,21 @@
-import Link from "next/link";
+import LegalPage from "../components/legal-page";
 
-export const metadata = { title: "Privacy Policy | RefactorFlow" };
+export const metadata = { title: "Privacy | RefactorFlow" };
 
 export default function PrivacyPage() {
-  return <main className="legal-page"><nav className="nav shell"><Link className="brand" href="/">Refactor<span>Flow</span></Link><Link className="text-link" href="/">â† Back home</Link></nav><article className="legal-content shell"><p className="kicker">Last updated: 18 July 2026</p><h1>Privacy policy</h1><p>RefactorFlow helps developers understand their working process. This policy explains what information we collect, why we collect it, and the choices you have.</p><h2>Information we collect</h2><p>When you use RefactorFlow, we may collect account details, challenge submissions, session timing, keystroke-derived signals, pauses, rewrites, and feedback you choose to provide. We do not need the contents of your private repositories to provide the core service.</p><h2>How we use information</h2><p>We use this information to provide session summaries, personalize coaching, improve challenges, secure the service, and communicate important account updates. We do not sell individual behavioral data.</p><h2>Ownership and sharing</h2><p>Your individual behavioral data belongs to you. We share information only with service providers required to operate RefactorFlow, when legally required, or when you direct us to do so. Any team reporting is designed to be aggregate-only.</p><h2>Retention and deletion</h2><p>We retain information while your account is active or as needed to provide the service. You may request access, correction, export, or deletion by contacting the RefactorFlow team.</p><h2>Security</h2><p>We use reasonable technical and organizational safeguards, including access controls and encrypted transport. No online service can guarantee absolute security.</p><h2>Contact</h2><p>Questions about this policy can be sent to the RefactorFlow team through the contact channel provided in your account.</p></article></main>;
+  return <LegalPage
+    eyebrow="Your data, explained"
+    title="Privacy policy."
+    updated="July 21, 2026"
+    intro="RefactorFlow is built to help you understand your coding process. That only works when your data is treated with care, restraint, and transparency."
+    sections={[
+      { title: "What we collect", paragraphs: ["We collect the information you provide when you create an account, such as your name and email address. When you use a coding exercise, we collect the code you submit, session duration, test outcome, and behavioral signals created during that session."], items: ["Keystrokes, edits, backspaces, and pauses recorded while a session is active", "Challenge attempts, test outcomes, and the reports generated from them", "Account preferences such as display name, theme, and coaching settings"] },
+      { title: "Why we use it", paragraphs: ["We use this information to operate RefactorFlow, provide your session reports, personalise your dashboard, protect the service, and improve the product. Behavioral data is used to describe patterns in your own practice, not to make decisions about employment, education, or eligibility." ] },
+      { title: "How sessions work", paragraphs: ["A session begins when you work in a RefactorFlow challenge. We save your submitted code and the signals needed to create the report you request. We do not secretly record activity outside the active RefactorFlow session or access files on your device." ] },
+      { title: "Sharing and processors", paragraphs: ["We do not sell your personal information. We only share data with service providers that help us run RefactorFlow, including Supabase for authentication and data storage, Vercel for application hosting, and Paystack if you choose a paid plan. Those providers may process data only to provide their services to us." ] },
+      { title: "Retention and your choices", paragraphs: ["You can edit your profile information in Settings, export your account data, or delete your account. We retain session data while your account remains active so that your reports and progress history remain available. When you delete your account, we delete or anonymise personal data as required by applicable law." ] },
+      { title: "Security", paragraphs: ["We use reasonable technical and organisational safeguards to protect your information. No online service can promise absolute security, so please use a unique password and contact us promptly if you believe your account has been accessed without permission." ] },
+      { title: "Changes and contact", paragraphs: ["We may update this policy as RefactorFlow evolves. If a change is material, we will update the date above and provide notice where appropriate. Questions about privacy can be sent to hello@refactorflow.dev." ] },
+    ]}
+  />;
 }
-
