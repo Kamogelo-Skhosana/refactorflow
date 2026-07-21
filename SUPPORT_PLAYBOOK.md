@@ -115,3 +115,5 @@ Documenting a bypass preserves the audit trail and prevents an emergency excepti
 ## Current milestone
 
 The product uses Supabase Auth and database routes, Monaco-based exercises, behavioral session tracking, and the safe Python runner scaffold. Paystack billing remains the intended payment integration.
+
+<!-- Temporary CI validation pull request. -->
