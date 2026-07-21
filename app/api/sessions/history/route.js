@@ -11,6 +11,16 @@ function getSupabaseConfig() {
   };
 }
 
+function label(value) {
+  return String(value || "").replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function functionName(challenge) {
+  const signature = String(challenge?.starter_code || "").split("\n").find((line) => /^\s*(def|function)\s+/.test(line));
+  const match = signature?.match(/(?:def|function)\s+([a-zA-Z_]\w*)/);
+  return (match?.[1] || challenge?.slug || "challenge") + "()";
+}
+
 function safeNumber(value, maximum = Number.MAX_SAFE_INTEGER) {
   const number = Number(value);
   return Number.isFinite(number) ? Math.min(Math.max(0, Math.round(number)), maximum) : 0;
@@ -51,7 +61,7 @@ export async function GET(request) {
   const sessions = await sessionResponse.json();
   const sessionIds = sessions.map((session) => session.id).filter(Boolean);
   const [challengeResponse, metricResponse] = await Promise.all([
-    fetch(url + "/rest/v1/challenges?select=id,slug,title", { headers, cache: "no-store" }),
+    fetch(url + "/rest/v1/challenges?select=id,slug,title,language,difficulty,starter_code", { headers, cache: "no-store" }),
     sessionIds.length
       ? fetch(url + "/rest/v1/metrics?session_id=in.(" + sessionIds.map(encodeURIComponent).join(",") + ")&select=session_id,keystroke_count,backspace_count,pause_count,thrashing_index,analysis", { headers, cache: "no-store" })
       : Promise.resolve(null),
@@ -75,7 +85,7 @@ export async function GET(request) {
       id: session.id,
       createdAt: session.created_at,
       durationMs: safeNumber(session.duration_ms, 86_400_000),
-      challenge: challenge ? { title: challenge.title, slug: challenge.slug } : { title: "Practice challenge", slug: null },
+      challenge: challenge ? { title: challenge.title, slug: challenge.slug, functionName: functionName(challenge), topic: label(challenge.language) + " " + label(challenge.difficulty) } : { title: "Practice challenge", slug: null, functionName: "challenge()", topic: "Practice" },
       result: { status: passed ? "passed" : "failed", passed: passedCount, total },
       metrics: {
         keystrokeCount: safeNumber(metric.keystroke_count, 1_000_000),
