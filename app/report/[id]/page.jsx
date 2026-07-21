@@ -169,7 +169,7 @@ export default function ReportPage({ params }) {
       <section className={styles.section}>
         <header><h2>Test results</h2><p className={passed ? styles.passedText : styles.failedText}>{resultSummary}</p></header>
         <div className={styles.tests}>{tests.map((test, index) => <article className={styles["test" + test.status.replace(/^./, (letter) => letter.toUpperCase())] || styles.testFailed} key={index}>
-          <i>{test.status === "passed" ? <>&#10003;</> : test.status === "skipped" ? "&ndash;" : "!"}</i>
+          <i>{test.status === "passed" ? <>&#10003;</> : test.status === "skipped" ? <>&ndash;</> : "!"}</i>
           <div><strong>{test.name}</strong>{test.error && <small>{test.error}</small>}</div>
         </article>)}</div>
       </section>
