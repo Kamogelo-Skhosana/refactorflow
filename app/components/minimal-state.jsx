@@ -33,7 +33,7 @@ export default function MinimalState({ kind, error, reset }) {
 
   return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
     <header className={styles.nav}>
-      <Link href="/" className={styles.wordmark}>Refactor<span>Flow</span></Link>
+      <Link href={signedIn ? "/dashboard" : "/"} className={styles.wordmark}>Refactor<span>Flow</span></Link>
       <button type="button" onClick={toggleTheme} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}><ThemeIcon dark={dark} /></button>
     </header>
     <section className={styles.content}>
