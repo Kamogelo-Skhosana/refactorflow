@@ -1,0 +1,49 @@
+name: Production Deploy Validation
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate production commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check JavaScript and TypeScript compatibility
+        run: npm run typecheck
+
+      - name: Run ESLint
+        run: npm run lint
+
+      # Vercel's GitHub integration detects this successful main push and
+      # performs the production deployment. Do not add a Vercel CLI deploy
+      # command here; that would create a duplicate deployment.
+      - name: Record Vercel deployment hand-off
+        run: echo "Vercel Git integration deploys main automatically."
+
+      # TODO(Stage 3): Add the separate Docker runner deployment here once its
+      # infrastructure, health checks, and deployment target are defined.
