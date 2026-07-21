@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "runner:build": "docker compose build runner"
+    "runner:build": "docker compose build runner",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@monaco-editor/react": "4.7.0",
@@ -16,5 +20,11 @@
     "zustand": "5.0.3",
     "recharts": "3.9.2",
     "react-is": "19.2.4"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "eslint-config-next": "16.1.6",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
   }
 }
