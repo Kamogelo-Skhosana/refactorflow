@@ -1,6 +1,6 @@
 import ChallengesClient from "./challenges-client";
 
-export const revalidate = 3600;
+// The Git deployment following a catalogue update refreshes this hourly cache once.\nexport const revalidate = 3600;
 
 async function getChallenges() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
