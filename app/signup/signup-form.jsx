@@ -134,12 +134,13 @@ export default function SignupForm() {
 
       window.localStorage.setItem("refactorflow-email", email.trim());
       window.localStorage.setItem("refactorflow-display-name", fullName.trim());
+      window.localStorage.setItem("refactorflow-onboarding-pending", "1");
 
       if (data.session?.access_token) {
         window.localStorage.setItem("refactorflow-access-token", data.session.access_token);
         window.localStorage.removeItem("refactorflow-show-name-prompt");
         setSuccessMessage("Account created - welcome to RefactorFlow!");
-        window.setTimeout(() => router.push("/dashboard"), 800);
+        window.setTimeout(() => router.push("/onboarding"), 800);
       } else {
         setSuccessMessage("Account created. Check your inbox to confirm your email.");
       }
@@ -170,6 +171,7 @@ export default function SignupForm() {
       }
 
       window.localStorage.setItem("refactorflow-email", magicEmail.trim());
+      window.localStorage.setItem("refactorflow-onboarding-pending", "1");
       setMagicSent(true);
     } catch {
       setMagicError("We could not send a magic link. Please try again.");
