@@ -99,7 +99,7 @@ function ThemeButton({ dark, onToggle }) {
 function Sidebar({ profile, dark, onToggle, onSignOut }) {
   return <aside className={styles.sidebar}>
     <div>
-      <Link className={styles.wordmark} href="/">RefactorFlow</Link>
+      <Link className={styles.wordmark} href="/dashboard">RefactorFlow</Link>
       <nav className={styles.sidebarNav} aria-label="Primary navigation">
         <Link className={styles.activeNav} href="/dashboard"><Icon name="dashboard" />Dashboard</Link>
         <Link href="/challenge"><Icon name="code" />Challenges</Link>
@@ -120,7 +120,7 @@ function Sidebar({ profile, dark, onToggle, onSignOut }) {
 
 function MobileNav({ profile, dark, onToggle }) {
   return <header className={styles.mobileNav}>
-    <Link className={styles.wordmark} href="/">RefactorFlow</Link>
+    <Link className={styles.wordmark} href="/dashboard">RefactorFlow</Link>
     <nav aria-label="Primary navigation">
       <Link className={styles.activeNav} href="/dashboard" aria-label="Dashboard"><Icon name="dashboard" /></Link>
       <Link href="/challenge" aria-label="Challenges"><Icon name="code" /></Link>
