@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "preserve",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "target": "ES2022"
+  },
+  "include": [
+    "app/**/*.js",
+    "app/**/*.jsx",
+    "lib/**/*.js",
+    "scripts/**/*.js",
+    "scripts/**/*.mjs"
+  ],
+  "exclude": [
+    ".next",
+    "coverage",
+    "dist",
+    "node_modules",
+    "runner",
+    "work"
+  ]
+}
