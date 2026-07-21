@@ -34,6 +34,13 @@ function passwordStrength(value) {
   return { bars: 2, label: "Fair", color: "amber" };
 }
 
+function handleWordmarkClick(event) {
+  if (window.localStorage.getItem("refactorflow-access-token")) {
+    event.preventDefault();
+    window.location.assign("/dashboard");
+  }
+}
+
 function SessionReportPreview() {
   return <section className={styles.reportCard} aria-label="Example RefactorFlow session report">
     <header className={styles.reportHeader}>
@@ -182,7 +189,7 @@ export default function SignupForm() {
 
   return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
     <aside className={styles.brandPanel}>
-      <Link className={styles.wordmark} href="/">RefactorFlow</Link>
+      <Link className={styles.wordmark} href="/" onClick={handleWordmarkClick}>RefactorFlow</Link>
       <div className={styles.reportWrap}><SessionReportPreview /></div>
       <div className={styles.statLines}>
         <p><i />Tracks every keystroke, pause, and rewrite in real time</p>
