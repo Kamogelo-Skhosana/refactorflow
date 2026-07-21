@@ -75,7 +75,7 @@ function Navigation({ active, compact = false }) {
 function Sidebar({ profile, active, onSignOut }) {
   return <aside className={styles.sidebar}>
     <div>
-      <Link className={styles.wordmark} href="/">RefactorFlow</Link>
+      <Link className={styles.wordmark} href="/dashboard">RefactorFlow</Link>
       <Navigation active={active} />
     </div>
     <div className={styles.sidebarBottom}>
@@ -92,7 +92,7 @@ function Sidebar({ profile, active, onSignOut }) {
 
 function MobileNav({ profile, active, dark, onToggle }) {
   return <header className={styles.mobileNav}>
-    <Link className={styles.wordmark} href="/">RefactorFlow</Link>
+    <Link className={styles.wordmark} href="/dashboard">RefactorFlow</Link>
     <Navigation active={active} compact />
     <div><Avatar profile={profile} /><ThemeButton dark={dark} onToggle={onToggle} /></div>
   </header>;
