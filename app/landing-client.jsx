@@ -189,6 +189,14 @@ export default function LandingClient() {
     setMenuOpen(false);
   }
 
+  function handleWordmarkClick(event) {
+    closeMenu();
+    if (window.localStorage.getItem("refactorflow-access-token")) {
+      event.preventDefault();
+      window.location.assign("/dashboard");
+    }
+  }
+
   const proPrice = billing === "monthly" ? "$12" : "$8";
   const proSuffix = billing === "monthly" ? "/ month" : "/ month";
   const proNote = billing === "monthly" ? "Cancel anytime" : "$96 billed annually";
@@ -196,7 +204,7 @@ export default function LandingClient() {
   return <main className={[styles.page, dark ? styles.dark : ""].filter(Boolean).join(" ")}>
     <nav className={[styles.nav, scrolled ? styles.navScrolled : ""].filter(Boolean).join(" ")}>
       <div className={styles.navInner}>
-        <Link className={styles.wordmark} href="/">RefactorFlow</Link>
+        <Link className={styles.wordmark} href="/" onClick={handleWordmarkClick}>RefactorFlow</Link>
         <div className={styles.navLinks}><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
         <div className={styles.navActions}>
           <button className={styles.themeButton} type="button" onClick={toggleTheme} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}><Icon name={dark ? "sun" : "moon"} size={18} /></button>
@@ -208,7 +216,7 @@ export default function LandingClient() {
     </nav>
 
     <div className={[styles.mobileMenu, menuOpen ? styles.mobileMenuOpen : ""].join(" ")} aria-hidden={!menuOpen}>
-      <div><Link className={styles.wordmark} href="/" onClick={closeMenu}>RefactorFlow</Link><button type="button" onClick={closeMenu} aria-label="Close menu"><Icon name="close" size={23} /></button></div>
+      <div><Link className={styles.wordmark} href="/" onClick={handleWordmarkClick}>RefactorFlow</Link><button type="button" onClick={closeMenu} aria-label="Close menu"><Icon name="close" size={23} /></button></div>
       <nav><a href="#how-it-works" onClick={closeMenu}>How it works</a><a href="#pricing" onClick={closeMenu}>Pricing</a><a href="#faq" onClick={closeMenu}>FAQ</a><Link href="/signin" onClick={closeMenu}>Sign in</Link><Link className={styles.mobileCta} href="/signup" onClick={closeMenu}>Start for free</Link></nav>
     </div>
 
@@ -277,7 +285,7 @@ export default function LandingClient() {
     </section>
 
     <footer className={styles.footer}>
-      <div className={styles.footerTop}><div><Link className={styles.footerWordmark} href="/">RefactorFlow</Link><p>Measure how you code, not just whether you pass.</p></div><nav><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><Link href="/signin">Sign in</Link><Link href="/signup">Start free</Link></nav><div className={styles.legalLinks}><Link href="/privacy">Privacy Policy</Link><Link href="/terms">Terms of Service</Link><Link href="/cookies">Cookie Policy</Link></div></div>
+      <div className={styles.footerTop}><div><Link className={styles.footerWordmark} href="/" onClick={handleWordmarkClick}>RefactorFlow</Link><p>Measure how you code, not just whether you pass.</p></div><nav><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><Link href="/signin">Sign in</Link><Link href="/signup">Start free</Link></nav><div className={styles.legalLinks}><Link href="/privacy">Privacy Policy</Link><Link href="/terms">Terms of Service</Link><Link href="/cookies">Cookie Policy</Link></div></div>
       <div className={styles.footerBottom}><span>&copy; 2026 RefactorFlow. All rights reserved.</span><em>Built for developers who want to understand how they think.</em></div>
     </footer>
   </main>;
