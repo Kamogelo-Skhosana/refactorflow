@@ -66,9 +66,10 @@ export default function SigninForm() {
     const accessToken = fragment.get("access_token");
     if (!accessToken) return;
     window.localStorage.setItem("refactorflow-access-token", accessToken);
-    window.localStorage.setItem("refactorflow-show-name-prompt", "1");
+    const nextRoute = window.localStorage.getItem("refactorflow-onboarding-pending") === "1" ? "/onboarding" : "/dashboard";
+    if (nextRoute === "/dashboard") window.localStorage.setItem("refactorflow-show-name-prompt", "1");
     window.history.replaceState({}, document.title, window.location.pathname);
-    router.replace("/dashboard");
+    router.replace(nextRoute);
   }, [router]);
 
   function toggleTheme() {
@@ -102,8 +103,9 @@ export default function SigninForm() {
       }
       window.localStorage.setItem("refactorflow-email", email.trim());
       if (data.session?.access_token) window.localStorage.setItem("refactorflow-access-token", data.session.access_token);
-      window.localStorage.setItem("refactorflow-show-name-prompt", "1");
-      router.push("/dashboard");
+      const nextRoute = window.localStorage.getItem("refactorflow-onboarding-pending") === "1" ? "/onboarding" : "/dashboard";
+      if (nextRoute === "/dashboard") window.localStorage.setItem("refactorflow-show-name-prompt", "1");
+      router.push(nextRoute);
     } catch {
       setSignInError("We could not sign you in right now. Please try again.");
     } finally {
