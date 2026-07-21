@@ -1,0 +1,267 @@
+.hero,
+.plans,
+.answer {
+  width: min(1100px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.hero {
+  padding: 104px 0 64px;
+  text-align: center;
+}
+
+.kicker {
+  margin: 0 0 14px;
+  color: #10b981;
+  font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 820px;
+  margin: 0 auto;
+  color: var(--marketing-text);
+  font-size: clamp(42px, 6vw, 76px);
+  letter-spacing: -0.07em;
+  line-height: 0.96;
+}
+
+.hero h1 em {
+  color: #10b981;
+  font-style: normal;
+}
+
+.hero > p:not(.kicker) {
+  max-width: 570px;
+  margin: 24px auto 0;
+  color: var(--marketing-muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.billing {
+  display: inline-flex;
+  gap: 3px;
+  margin-top: 34px;
+  padding: 4px;
+  border: 1px solid var(--marketing-border);
+  border-radius: 10px;
+  background: var(--marketing-card);
+}
+
+.billing button {
+  height: 34px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--marketing-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.billing button.selected {
+  background: var(--marketing-text);
+  color: var(--marketing-card);
+}
+
+.billing span {
+  margin-left: 4px;
+  color: #10b981;
+  font-size: 10px;
+}
+
+.plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: stretch;
+  gap: 14px;
+  padding-bottom: 110px;
+}
+
+.plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 470px;
+  padding: 30px;
+  border: 1px solid var(--marketing-border);
+  border-radius: 14px;
+  background: var(--marketing-card);
+}
+
+.plan.featured {
+  border: 1.5px solid #10b981;
+  box-shadow: 0 18px 50px rgba(16, 185, 129, 0.1);
+}
+
+.popular {
+  position: absolute;
+  top: -12px;
+  left: 25px;
+  margin: 0;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #10b981;
+  color: #0a0a0a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.planName {
+  margin: 0;
+  color: var(--marketing-text);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  min-height: 60px;
+  margin: 16px 0 10px;
+}
+
+.price strong,
+.customPrice {
+  color: var(--marketing-text);
+  font-size: 42px;
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+
+.price span {
+  color: var(--marketing-faint);
+  font-size: 12px;
+}
+
+.customPrice {
+  display: block;
+  min-height: 60px;
+  margin: 16px 0 10px;
+  font-size: 31px;
+  line-height: 1.35;
+}
+
+.planCopy {
+  min-height: 54px;
+  margin: 0;
+  color: var(--marketing-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.primary,
+.secondary {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 25px 0;
+  padding: 0 14px;
+  border: 1px solid var(--marketing-border);
+  border-radius: 8px;
+  color: var(--marketing-text);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.primary {
+  border-color: #10b981;
+  background: #10b981;
+  color: #0a0a0a;
+}
+
+.primary:hover,
+.secondary:hover {
+  transform: translateY(-1px);
+  border-color: #10b981;
+}
+
+.secondary:hover {
+  color: #10b981;
+}
+
+.plan ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--marketing-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.plan li i {
+  color: #10b981;
+  font-style: normal;
+}
+
+.answer {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 60px;
+  margin-bottom: 110px;
+  padding: 40px;
+  border-radius: 14px;
+  background: var(--marketing-soft);
+}
+
+.answer h2 {
+  max-width: 330px;
+  margin: 0;
+  color: var(--marketing-text);
+  font-size: 28px;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.answer > p {
+  align-self: end;
+  margin: 0;
+  color: var(--marketing-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+@media (max-width: 800px) {
+  .hero,
+  .plans,
+  .answer {
+    width: min(100% - 32px, 1100px);
+  }
+
+  .hero {
+    padding: 72px 0 45px;
+  }
+
+  .plans {
+    grid-template-columns: 1fr;
+    padding-bottom: 70px;
+  }
+
+  .plan {
+    min-height: auto;
+  }
+
+  .answer {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-bottom: 70px;
+    padding: 28px 22px;
+  }
+}
