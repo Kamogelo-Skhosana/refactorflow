@@ -31,7 +31,13 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "::warning::package-lock.json is not committed yet; using npm install until it is added."
+            npm install --no-audit --no-fund
+          fi
 
       - name: Check JavaScript and TypeScript compatibility
         run: npm run typecheck
