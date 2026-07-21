@@ -94,8 +94,8 @@ function Icon({ name, size = 16 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{icons[name]}</svg>;
 }
 
-function Reveal({ children, className = "" }) {
-  return <div className={[styles.reveal, className].filter(Boolean).join(" ")}>{children}</div>;
+function Reveal({ children, className = "", ...props }) {
+  return <div {...props} className={[styles.reveal, className].filter(Boolean).join(" ")}>{children}</div>;
 }
 
 function PrimaryButton({ href = "/signup", children, className = "" }) {
