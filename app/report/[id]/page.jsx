@@ -109,7 +109,7 @@ export default function ReportPage({ params }) {
       </header>
 
       <section className={passed ? styles.outcomePass : styles.outcomeFail}>
-        <div><span>{passed ? "&#10003;" : "!"}</span><p>{passed ? "All tests passed" : "Keep iterating"}</p></div>
+        <div><span>{passed ? <>&#10003;</> : "!"}</span><p>{passed ? "All tests passed" : "Keep iterating"}</p></div>
         <strong>{report.result.passed}/{report.result.total}</strong>
         <small>private tests passed</small>
         <em>{formatDuration(report.durationMs)} in focus</em>
