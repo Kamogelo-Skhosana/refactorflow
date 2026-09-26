@@ -11,6 +11,29 @@ function getSupabaseConfig() {
   };
 }
 
+// PostgREST takes the id list in the URL, and the Supabase gateway rejects very
+// long request lines. Past a couple of hundred sessions a single in.(...) query
+// silently returned nothing, so the ids are fetched in batches instead.
+const ID_BATCH_SIZE = 100;
+
+function idBatches(ids) {
+  const batches = [];
+  for (let index = 0; index < ids.length; index += ID_BATCH_SIZE) {
+    batches.push(ids.slice(index, index + ID_BATCH_SIZE));
+  }
+  return batches;
+}
+
+async function fetchBySessionIds(url, headers, path, sessionIds) {
+  const responses = await Promise.all(
+    idBatches(sessionIds).map((batch) =>
+      fetch(url + path + "&session_id=in.(" + batch.map(encodeURIComponent).join(",") + ")", { headers, cache: "no-store" }),
+    ),
+  );
+  const rows = await Promise.all(responses.map((response) => (response.ok ? response.json() : [])));
+  return rows.flat();
+}
+
 function label(value) {
   return String(value || "").replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
@@ -60,15 +83,14 @@ export async function GET(request) {
 
   const sessions = await sessionResponse.json();
   const sessionIds = sessions.map((session) => session.id).filter(Boolean);
-  const [challengeResponse, metricResponse] = await Promise.all([
+  const [challengeResponse, metrics] = await Promise.all([
     fetch(url + "/rest/v1/challenges?select=id,slug,title,language,difficulty,starter_code", { headers, cache: "no-store" }),
     sessionIds.length
-      ? fetch(url + "/rest/v1/metrics?session_id=in.(" + sessionIds.map(encodeURIComponent).join(",") + ")&select=session_id,keystroke_count,backspace_count,pause_count,thrashing_index,analysis", { headers, cache: "no-store" })
-      : Promise.resolve(null),
+      ? fetchBySessionIds(url, headers, "/rest/v1/metrics?select=session_id,keystroke_count,backspace_count,pause_count,thrashing_index,analysis", sessionIds)
+      : Promise.resolve([]),
   ]);
 
   const challenges = challengeResponse.ok ? await challengeResponse.json() : [];
-  const metrics = metricResponse?.ok ? await metricResponse.json() : [];
   const challengeById = new Map(challenges.map((challenge) => [challenge.id, challenge]));
   const metricsBySession = new Map(metrics.map((metric) => [metric.session_id, metric]));
 

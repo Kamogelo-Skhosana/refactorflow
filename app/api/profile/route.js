@@ -133,6 +133,10 @@ export async function PATCH(request) {
     return NextResponse.json({ error: "Choose a setting to update." }, { status: 400 });
   }
 
+  // The row has to exist before PATCH, otherwise it matches nothing and the
+  // update is silently dropped while the response still looks successful.
+  await findOrCreateProfile(context.url, context.headers, context.user);
+
   const response = await fetch(
     context.url + "/rest/v1/profiles?id=eq." + encodeURIComponent(context.user.id),
     {
@@ -146,5 +150,9 @@ export async function PATCH(request) {
   }
 
   const [profile] = await response.json();
+  if (!profile) {
+    return NextResponse.json({ error: "Your profile could not be saved." }, { status: 502 });
+  }
+
   return NextResponse.json({ profile: profilePayload(profile, context.user) });
 }

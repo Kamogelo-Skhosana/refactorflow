@@ -23,6 +23,29 @@ async function getAuthenticatedUser(request, url, publishable) {
   return response.ok ? response.json() : null;
 }
 
+// PostgREST takes the id list in the URL, and the Supabase gateway rejects very
+// long request lines. Past a couple of hundred sessions a single in.(...) query
+// silently returned nothing, so the ids are fetched in batches instead.
+const ID_BATCH_SIZE = 100;
+
+function idBatches(ids) {
+  const batches = [];
+  for (let index = 0; index < ids.length; index += ID_BATCH_SIZE) {
+    batches.push(ids.slice(index, index + ID_BATCH_SIZE));
+  }
+  return batches;
+}
+
+async function fetchBySessionIds(url, headers, path, sessionIds) {
+  const responses = await Promise.all(
+    idBatches(sessionIds).map((batch) =>
+      fetch(url + path + "&session_id=in.(" + batch.map(encodeURIComponent).join(",") + ")", { headers, cache: "no-store" }),
+    ),
+  );
+  const rows = await Promise.all(responses.map((response) => (response.ok ? response.json() : [])));
+  return rows.flat();
+}
+
 function safeScore(value) {
   const score = Number(value);
   return Number.isFinite(score) ? Math.min(100, Math.max(0, Math.round(score))) : null;
@@ -75,22 +98,15 @@ export async function GET(request) {
   const sessionIds = [...exerciseIdBySessionId.keys()];
 
   if (sessionIds.length) {
-    const metricsResponse = await fetch(
-      url + "/rest/v1/metrics?session_id=in.(" + sessionIds.map(encodeURIComponent).join(",") + ")&select=session_id,thrashing_index",
-      { headers, cache: "no-store" },
-    );
-
-    if (metricsResponse.ok) {
-      const metrics = await metricsResponse.json();
-      metrics.forEach((metric) => {
-        const exerciseId = exerciseIdBySessionId.get(metric.session_id);
-        const score = safeScore(metric.thrashing_index);
-        if (!exerciseId || score === null) return;
-        if (bestThrashingByExercise[exerciseId] === undefined || score < bestThrashingByExercise[exerciseId]) {
-          bestThrashingByExercise[exerciseId] = score;
-        }
-      });
-    }
+    const metrics = await fetchBySessionIds(url, headers, "/rest/v1/metrics?select=session_id,thrashing_index", sessionIds);
+    metrics.forEach((metric) => {
+      const exerciseId = exerciseIdBySessionId.get(metric.session_id);
+      const score = safeScore(metric.thrashing_index);
+      if (!exerciseId || score === null) return;
+      if (bestThrashingByExercise[exerciseId] === undefined || score < bestThrashingByExercise[exerciseId]) {
+        bestThrashingByExercise[exerciseId] = score;
+      }
+    });
   }
 
   return NextResponse.json({

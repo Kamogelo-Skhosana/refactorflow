@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChallengeEditor from "./editor";
 import styles from "./challenge-workspace.module.css";
 
@@ -25,6 +25,13 @@ function Icon({ name, size = 16 }) {
 
   return <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{icons[name]}</svg>;
 }
+
+const NUDGE_MESSAGES = {
+  panicPause: { title: "Take a breath.", message: "Break the problem into smaller steps - what is the very first thing the function needs to do?" },
+  thrashLoop: { title: "You've rewritten quite a bit.", message: "That's okay. Write what the function should do in plain English before you type any more code." },
+  stuck: { title: "Still thinking?", message: "Re-read the description - sometimes the answer is in the wording of the problem." },
+  flow: { title: "You're in good flow.", message: "Keep going." },
+};
 
 function formatTime(seconds) {
   return String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
@@ -148,12 +155,22 @@ export default function ChallengeWorkspace({ challenge }) {
   const bodyRef = useRef(null);
   const secondsRef = useRef(0);
   const nudgeCooldowns = useRef({});
+  const resizing = useRef(false);
 
   const signature = useMemo(() => functionSignature(challenge.starter_code), [challenge.starter_code]);
   const titleFunction = useMemo(() => functionName(signature, challenge.slug), [signature, challenge.slug]);
   const passed = Number(result?.passed) || 0;
   const total = Number(result?.total) || 0;
   const hasResults = Boolean(result);
+
+  const presentNudge = useCallback((type) => {
+    if (!nudgesEnabled || nudge || !NUDGE_MESSAGES[type]) return;
+    const now = Date.now();
+    if (now - (nudgeCooldowns.current[type] || 0) < 300000) return;
+    nudgeCooldowns.current[type] = now;
+    if (type === "panicPause") setPanicHintUnlocked(true);
+    setNudge({ type, ...NUDGE_MESSAGES[type] });
+  }, [nudgesEnabled, nudge]);
 
   useEffect(() => {
     const preferredDark = window.localStorage.getItem("refactorflow-theme") === "dark" || document.documentElement.classList.contains("dark");
@@ -203,7 +220,7 @@ export default function ChallengeWorkspace({ challenge }) {
     if (!nudgesEnabled) return;
     if (seconds === 120) presentNudge("stuck");
     if (seconds === 75) presentNudge("flow");
-  }, [seconds, nudgesEnabled]);
+  }, [seconds, nudgesEnabled, presentNudge]);
 
   useEffect(() => {
     if (!nudge) return undefined;
@@ -234,23 +251,6 @@ export default function ChallengeWorkspace({ challenge }) {
     return () => window.removeEventListener("keydown", shortcuts);
   }, []);
 
-  function presentNudge(type) {
-    if (!nudgesEnabled || nudge) return;
-    const now = Date.now();
-    if (now - (nudgeCooldowns.current[type] || 0) < 300000) return;
-    nudgeCooldowns.current[type] = now;
-    if (type === "panicPause") setPanicHintUnlocked(true);
-
-    const messages = {
-      panicPause: { title: "Take a breath.", message: "Break the problem into smaller steps - what is the very first thing the function needs to do?" },
-      thrashLoop: { title: "You've rewritten quite a bit.", message: "That's okay. Write what the function should do in plain English before you type any more code." },
-      stuck: { title: "Still thinking?", message: "Re-read the description - sometimes the answer is in the wording of the problem." },
-      flow: { title: "You're in good flow.", message: "Keep going." },
-    };
-
-    setNudge({ type, ...messages[type] });
-  }
-
   function toggleTheme() {
     const nextDark = !dark;
     setDark(nextDark);
@@ -261,10 +261,20 @@ export default function ChallengeWorkspace({ challenge }) {
 
   function beginResize(event) {
     event.currentTarget.setPointerCapture(event.pointerId);
+    resizing.current = true;
+  }
+
+  function endResize(event) {
+    resizing.current = false;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   }
 
   function resize(event) {
-    if (!bodyRef.current) return;
+    // Without this guard the panel jumps whenever the pointer merely crosses
+    // the divider, because pointermove fires with no button held down.
+    if (!resizing.current || event.buttons === 0 || !bodyRef.current) return;
     const bounds = bodyRef.current.getBoundingClientRect();
     setLeftWidth(Math.max(240, Math.min(480, event.clientX - bounds.left)));
   }
@@ -350,7 +360,7 @@ export default function ChallengeWorkspace({ challenge }) {
               keystrokeCount: data.keystrokeCount,
               backspaceCount: data.backspaceCount,
               pauseCount: data.pauseEvents.length,
-              longestPauseMs: Math.max(0, ...data.pauseEvents.map((event) => event.duration)),
+              longestPauseMs: data.pauseEvents.reduce((longest, event) => Math.max(longest, Number(event?.duration) || 0), 0),
               thrashingIndex: data.thrashingIndex,
               classification: data.classification,
               tapeAnalysis: data.tapeAnalysis,
@@ -412,7 +422,7 @@ export default function ChallengeWorkspace({ challenge }) {
           {runError && activeTab === "results" && <p className={styles.runError} role="alert">{runError}</p>}
         </div>
       </aside>
-      <div className={styles.resizeHandle} role="separator" aria-label="Resize challenge panel" aria-orientation="vertical" onPointerDown={beginResize} onPointerMove={resize} />
+      <div className={styles.resizeHandle} role="separator" aria-label="Resize challenge panel" aria-orientation="vertical" onPointerDown={beginResize} onPointerMove={resize} onPointerUp={endResize} onPointerCancel={endResize} />
       <div className={styles.editorZone}>
         <Nudge nudge={nudge} onDismiss={() => setNudge(null)} />
         <ChallengeEditor challenge={challenge} dark={dark} fontSize={fontSize} checking={checking} onRun={submitSession} onEditing={handleEditing} onBehavior={presentNudge} onReset={resetSession} />

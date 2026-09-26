@@ -67,7 +67,14 @@ async function getAuthenticatedUser(request, url, publishable) {
 
 function canRun(userId) {
   const now = Date.now();
-  const timestamps = (runAttempts.get(userId) || []).filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS);
+  // Prune expired entries, otherwise the map grows for the life of the process.
+  for (const [id, attempts] of runAttempts) {
+    const recent = attempts.filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS);
+    if (recent.length) runAttempts.set(id, recent);
+    else runAttempts.delete(id);
+  }
+
+  const timestamps = runAttempts.get(userId) || [];
   if (timestamps.length >= RATE_LIMIT_MAX_RUNS) return false;
   timestamps.push(now);
   runAttempts.set(userId, timestamps);

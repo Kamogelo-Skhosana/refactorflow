@@ -7,6 +7,9 @@ import { analyzeTape } from "../../../lib/tape-analyzer";
 import { classifyThrashingIndex, computeThrashingIndex } from "../../../lib/metrics";
 import styles from "./challenge-workspace.module.css";
 
+const PAUSE_THRESHOLD_MS = 2000;
+const PANIC_PAUSE_MS = 8000;
+
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => <div className={styles.editorLoading}>Loading editor&hellip;</div>,
@@ -36,20 +39,46 @@ export default function ChallengeEditor({ challenge, dark, fontSize, checking, o
     };
   }, [challenge.id, challenge.starter_code, initSession]);
 
+  const behaviorRef = useRef(onBehavior);
+  useEffect(() => {
+    behaviorRef.current = onBehavior;
+  }, [onBehavior]);
+
   useEffect(() => {
     if (checking) return undefined;
+    // One idle stretch is one pause. It is recorded when typing resumes (or
+    // when the session ends), so a single long think is never split into a
+    // string of short "thoughtful" pauses and panic pauses can be detected.
+    let pauseAnchor = null;
+    let panicNotified = false;
+
     const pauseTimer = window.setInterval(() => {
       const state = useSessionStore.getState();
       const last = state.lastKeystrokeAt;
       if (!last) return;
+
+      if (pauseAnchor !== null && last !== pauseAnchor) {
+        state.recordPause(last - pauseAnchor);
+        pauseAnchor = null;
+        panicNotified = false;
+      }
+
       const elapsed = Date.now() - last;
-      if (elapsed < 2000) return;
-      state.recordPause(elapsed);
-      if (elapsed >= 8000) onBehavior?.("panicPause");
+      if (elapsed < PAUSE_THRESHOLD_MS) return;
+      pauseAnchor = last;
+      if (elapsed >= PANIC_PAUSE_MS && !panicNotified) {
+        panicNotified = true;
+        behaviorRef.current?.("panicPause");
+      }
     }, 500);
 
-    return () => window.clearInterval(pauseTimer);
-  }, [checking, onBehavior]);
+    return () => {
+      window.clearInterval(pauseTimer);
+      if (pauseAnchor === null) return;
+      const elapsed = Date.now() - pauseAnchor;
+      if (elapsed >= PAUSE_THRESHOLD_MS) useSessionStore.getState().recordPause(elapsed);
+    };
+  }, [checking]);
 
   const submit = useCallback(async () => {
     if (checking || !initialized) return;

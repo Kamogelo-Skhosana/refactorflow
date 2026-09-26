@@ -10,13 +10,13 @@ export async function POST(request) {
   if (!url || !key) return NextResponse.json({ error: "Supabase Auth is not configured yet." }, { status: 503 });
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin).replace(/\/$/, "");
-  const response = await fetch(url + "/auth/v1/otp", {
+  const redirectTo = appUrl + "/signin";
+  const response = await fetch(url + "/auth/v1/otp?redirect_to=" + encodeURIComponent(redirectTo), {
     method: "POST",
     headers: { apikey: key, "Content-Type": "application/json" },
     body: JSON.stringify({
       email: normalizedEmail,
       create_user: false,
-      email_redirect_to: appUrl + "/signin",
     }),
   });
   const data = await response.json().catch(() => ({}));

@@ -23,6 +23,29 @@ async function getAuthenticatedUser(request, url, publishable) {
   return response.ok ? response.json() : null;
 }
 
+// PostgREST takes the id list in the URL, and the Supabase gateway rejects very
+// long request lines. Past a couple of hundred sessions a single in.(...) query
+// silently returned nothing, so the ids are fetched in batches instead.
+const ID_BATCH_SIZE = 100;
+
+function idBatches(ids) {
+  const batches = [];
+  for (let index = 0; index < ids.length; index += ID_BATCH_SIZE) {
+    batches.push(ids.slice(index, index + ID_BATCH_SIZE));
+  }
+  return batches;
+}
+
+async function fetchBySessionIds(url, headers, path, sessionIds) {
+  const responses = await Promise.all(
+    idBatches(sessionIds).map((batch) =>
+      fetch(url + path + "&session_id=in.(" + batch.map(encodeURIComponent).join(",") + ")", { headers, cache: "no-store" }),
+    ),
+  );
+  const rows = await Promise.all(responses.map((response) => (response.ok ? response.json() : [])));
+  return rows.flat();
+}
+
 export async function GET(request) {
   const { url, secret, publishable } = getSupabaseConfig();
   if (!url || !secret || !publishable) {
@@ -49,12 +72,12 @@ export async function GET(request) {
   const sessions = await sessionsResponse.json();
   let metrics = [];
   if (sessions.length) {
-    const ids = sessions.map((session) => encodeURIComponent(session.id)).join(",");
-    const metricResponse = await fetch(
-      url + "/rest/v1/metrics?session_id=in.(" + ids + ")&select=session_id,keystroke_count,backspace_count,pause_count,longest_pause_ms,thrashing_index,raw_events,analysis,created_at&order=created_at.asc",
-      { headers, cache: "no-store" },
+    metrics = await fetchBySessionIds(
+      url,
+      headers,
+      "/rest/v1/metrics?select=session_id,keystroke_count,backspace_count,pause_count,longest_pause_ms,thrashing_index,raw_events,analysis,created_at&order=created_at.asc",
+      sessions.map((session) => session.id).filter(Boolean),
     );
-    if (metricResponse.ok) metrics = await metricResponse.json();
   }
 
   const [profile] = profileResponse.ok ? await profileResponse.json() : [];

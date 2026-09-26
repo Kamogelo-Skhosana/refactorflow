@@ -1,0 +1,11 @@
+# Keep the repository on LF so Windows checkouts do not show every file as
+# modified and `npm run format:check` (endOfLine: "lf") stays green.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

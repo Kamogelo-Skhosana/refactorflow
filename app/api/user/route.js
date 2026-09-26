@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+const ID_BATCH_SIZE = 100;
+
 function getSupabaseConfig() {
   return {
     url: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -51,7 +53,7 @@ export async function DELETE(request) {
     { headers, cache: "no-store" },
   );
   const sessions = sessionResponse.ok ? await sessionResponse.json() : [];
-  const sessionIds = sessions.map((session) => encodeURIComponent(session.id)).filter(Boolean);
+  const sessionIds = sessions.map((session) => session.id).filter(Boolean);
 
   const deletion = await fetch(url + "/auth/v1/admin/users/" + userId, {
     method: "DELETE",
@@ -61,18 +63,18 @@ export async function DELETE(request) {
     return NextResponse.json({ error: "Your account could not be deleted. Please try again." }, { status: 502 });
   }
 
-  const cleanup = [
-    fetch(url + "/rest/v1/hints_used?user_id=eq." + userId, { method: "DELETE", headers }),
+  // Child rows first, and in batches: a single in.(...) holding every session id
+  // exceeded the gateway request-line limit and left metrics behind.
+  for (let index = 0; index < sessionIds.length; index += ID_BATCH_SIZE) {
+    const batch = sessionIds.slice(index, index + ID_BATCH_SIZE).map(encodeURIComponent).join(",");
+    await fetch(url + "/rest/v1/metrics?session_id=in.(" + batch + ")", { method: "DELETE", headers }).catch(() => undefined);
+  }
+  await fetch(url + "/rest/v1/sessions?user_id=eq." + userId, { method: "DELETE", headers }).catch(() => undefined);
+  await fetch(url + "/rest/v1/hints_used?user_id=eq." + userId, { method: "DELETE", headers }).catch(() => undefined);
+  await Promise.allSettled([
     fetch(url + "/rest/v1/profiles?id=eq." + userId, { method: "DELETE", headers }),
     fetch(url + "/storage/v1/object/avatars/" + userId + "/avatar", { method: "DELETE", headers }),
-  ];
-  if (sessionIds.length) {
-    cleanup.push(
-      fetch(url + "/rest/v1/metrics?session_id=in.(" + sessionIds.join(",") + ")", { method: "DELETE", headers }),
-      fetch(url + "/rest/v1/sessions?user_id=eq." + userId, { method: "DELETE", headers }),
-    );
-  }
-  await Promise.allSettled(cleanup);
+  ]);
 
   return new NextResponse(null, { status: 204 });
 }

@@ -21,14 +21,14 @@ export async function POST(request) {
   }
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin).replace(/\/$/, "");
-  const response = await fetch(url + "/auth/v1/signup", {
+  const redirectTo = appUrl + "/signin";
+  const response = await fetch(url + "/auth/v1/signup?redirect_to=" + encodeURIComponent(redirectTo), {
     method: "POST",
     headers: { apikey: key, "Content-Type": "application/json" },
     body: JSON.stringify({
       email,
       password,
       data: { full_name: fullName },
-      redirect_to: appUrl + "/signin",
     }),
   });
   const data = await response.json().catch(() => ({}));
